@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SENTIVISION</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #283c86, #45a247);
+        color: #fff;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: 3rem;
+        color: white;
+        margin-bottom: 20px;
+      }
+
+      img {
+        width: 40%;
+        height: 500px;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80%;
+      }
+      .container1 {
+        display: flex;
+        justify-content: left;
+        align-items: left;
+        margin-left: 22%;
+        width: 80%;
+      }
+
+      .control-area-container,
+      .table-container {
+        width: 40%;
+        padding: 20px;
+        height: 300px; /* Set the same height for both the table and control area */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
+      }
+
+      .control-area {
+        width: 80%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        font-family: "Arial", sans-serif;
+        text-align: center;
+        padding: 10px;
+        color: #fff;
+      }
+
+      .control-area.active {
+        background-color: rgba(72, 176, 79, 0.8);
+      }
+
+      .instructions {
+        position: absolute;
+        bottom: 10px;
+        width: 100%;
+        font-size: 14px;
+        color: darkblue;
+        text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+      }
+
+      .control-area span {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+      }
+
+      table {
+        width: 100%;
+        height: 100%;
+        border-collapse: collapse;
+        background-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+      }
+
+      table th,
+      table td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      }
+
+      table th {
+        font-size: 1.2em;
+        background: rgba(255, 255, 255, 0.3);
+        text-transform: uppercase;
+      }
+
+      table td {
+        font-size: 1em;
+        color: #fff;
+      }
+      .show-detections-btn {
+        background-color: #45a247;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-top: 10px;
+      }
+
+      .show-detections-btn:hover {
+        background-color: #3a8e3b;
+      }
+      .button-container {
+        display: flex;
+        justify-content: center; /* Align buttons in the center */
+        gap: 10px; /* Space between buttons */
+    }
+    
+    
+    .custom-button {
+        background-color: #4CAF50; /* Green background */
+        color: white; /* White text color */
+        border: none; /* Remove borders */
+        border-radius: 50px; /* Make the button fully rounded */
+        padding: 10px 20px; /* Add padding for a larger click area */
+        font-size: 16px; /* Increase font size for readability */
+        cursor: pointer; /* Show a pointer cursor on hover */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+        transition: transform 0.2s ease, box-shadow 0.2s ease; /* Add smooth animation */
+    }
+    
+    
+    .custom-button:hover {
+        background-color: #45a049; /* Darker green on hover */
+        transform: scale(1.05); /* Slightly enlarge the button */
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Enhance shadow on hover */
+    }
+    
+    
+    .custom-button:active {
+        transform: scale(0.95); /* Slightly shrink on click */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Reduce shadow on click */
+    }
+    </style>
+  </head>
+  <body>
+    <h1>SENTIVISION</h1>
+    
+        <img id="video-stream" src="/video_feed" alt="Video Stream" />
+     <div class="container1">
+        <button id="showDetectionsBtn" class="show-detections-btn">Show Detections</button>
+    </div>
+    <div class="container">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Confidence</th>
+              <th>X Coordinate</th>
+              <th>Y Coordinate</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="detected-objects">
+            {% for obj in objects %}
+            <tr>
+              <td>{{ obj.class }}</td>
+              <td>{{ obj.confidence }}</td>
+              <td>{{ obj.x }}</td>
+              <td>{{ obj.y }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="control-area-container">
+        <div id="control-area" class="control-area" tabindex="0">
+          <span id="defaultText">Click here and use W, A, S, D to move</span>
+          <div class="instructions">Press 'X' to stop</div>
+        </div>
+      </div>
+    </div>
+    <h1>Control Servo Offsets</h1>
+
+    <div class="button-container">
+        <button class="custom-button" onclick="adjustOffset('up')">Up</button>
+        <button class="custom-button" onclick="adjustOffset('down')">Down</button>
+        <button class="custom-button" onclick="adjustOffset('left')">Left</button>
+        <button class="custom-button" onclick="adjustOffset('right')">Right</button>
+    </div>
+    <script>
+    let selectedCoordinates = { x: 0, y: 0 };
+      const controlArea = document.getElementById("control-area");
+      const defaultText = document.getElementById("defaultText");
+      const showDetectionsBtn = document.getElementById("showDetectionsBtn");
+
+      // Store the original text content
+      const originalText = defaultText.innerHTML;
+
+      // Flag to track if control area is active
+      let isControlActive = false;
+
+      // When the control area is clicked, focus on it and activate it
+      controlArea.addEventListener("click", () => {
+        controlArea.focus();
+        controlArea.classList.add("active");
+        isControlActive = true; // Set flag to active
+      });
+
+      // Listen for when the control area loses focus (deactivates)
+      controlArea.addEventListener("blur", () => {
+        controlArea.classList.remove("active");
+        isControlActive = false; // Reset flag
+        // Restore the original text
+        defaultText.innerHTML = originalText;
+      });
+
+      // Listen for keydown event to detect W, A, S, D
+      controlArea.addEventListener("keydown", (event) => {
+        if (isControlActive) {
+          const validKeys = ["W", "A", "S", "D", "X"]; // Include 'X' for stop
+          const keyPressed = event.key.toUpperCase();
+
+          // Only handle W, A, S, D, and X keys
+          if (validKeys.includes(keyPressed)) {
+            // Update text to show pressed key
+            defaultText.innerHTML = `${keyPressed} is pressed`;
+
+            // Send the motor command to the server
+            fetch(`/control_robot`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ command: keyPressed }),
+            })
+              .then((response) => response.json())
+              .then((data) => console.log("Control command response:", data))
+              .catch((error) =>
+                console.error("Error sending control command:", error)
+              );
+          }
+        }
+      });
+
+      // Function to update the detected objects table
+      function updateTable(objects) {
+        const tableBody = document.getElementById("detected-objects");
+        tableBody.innerHTML = ""; // Clear the table before updating
+        objects.forEach((obj, index) => {
+          // Create a row for each detected object
+          const row = document.createElement("tr");
+      
+          // Add the object details to the row
+          row.innerHTML = `
+            <td>${obj.class}</td>
+            <td>${obj.confidence}</td>
+            <td>${obj.coordinates.x}</td>
+            <td>${obj.coordinates.y}</td>
+            <td><button class="detect-btn" 
+                      data-index="${index}" 
+                      data-x="${obj.coordinates.x}" 
+                      data-y="${obj.coordinates.y}">
+                Detect
+              </button></td>
+          `;
+      
+          // Append the row to the table
+          tableBody.appendChild(row);
+      
+          // Add event listener to the "Detect" button
+          const detectButton = row.querySelector(".detect-btn");
+          detectButton.addEventListener("click", () => {
+            // Send a request to the /detect endpoint with the specific object data
+            const objectData = {
+              class: obj.class,
+              confidence: obj.confidence,
+              coordinates: obj.coordinates,
+            };
+            selectedCoordinates.x = parseFloat(detectButton.getAttribute("data-x"));
+            selectedCoordinates.y = parseFloat(detectButton.getAttribute("data-y"));
+      
+            fetch("/detect", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(objectData),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                console.log("Detection response:", data);
+                // Optionally, show a message or update UI based on the response
+              })
+              .catch((error) => {
+                console.error("Error sending detection request:", error);
+              });
+          });
+        });
+      }
+
+      // Function to fetch latest updates when the button is clicked
+      showDetectionsBtn.addEventListener("click", () => {
+        fetch("/latest_updates")
+          .then((response) => response.json())
+          .then((data) => {
+            const objects = data.objects;  // Access the objects array from the response
+            if (Array.isArray(objects)) {
+              updateTable(objects);
+              console.log(objects);
+            } else {
+              console.error("Expected an array, but got:", objects);
+            }
+          })
+          .catch((error) =>
+            console.error("Error fetching latest updates:", error)
+          );
+    });
+
+    function adjustOffset(direction) {
+        fetch('/detect_coordinates', {  // Get current coordinates
+            method: 'POST',
+        })
+        .then(response => response.json())
+        .then(data => {
+              // Get current coordinates from /detect
+            let x_offset = 0;
+            let y_offset = 0;
+
+            // Adjust the offsets based on the button pressed
+            if (direction === 'up') {
+                y_offset = -5;
+            } else if (direction === 'down') {
+                y_offset = 5;
+            } else if (direction === 'left') {
+                x_offset = -5;
+            } else if (direction === 'right') {
+                x_offset = +5;
+            }
+
+                    // Apply the offsets to the selected coordinates
+            const updatedX = selectedCoordinates.x + x_offset;
+            const updatedY = selectedCoordinates.y + y_offset;
+
+            console.log("Updated Coordinates:", updatedX, updatedY);
+            selectedCoordinates.x = updatedX;
+            selectedCoordinates.y = updatedY;
+            // Send updated coordinates and offsets to the server
+            updateOffsets(updatedX, updatedY);
+        })
+        .catch(error => console.error('Error fetching coordinates:', error));
+    }
+
+    function updateOffsets(x, y) {
+        fetch('/update_offsets', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                x_offset: x,
+                y_offset: y
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Offsets updated:', data);
+        })
+        .catch(error => {
+            console.error('Error updating offsets:', error);
+        });
+    }
+    </script>
+  </body>
+</html>
